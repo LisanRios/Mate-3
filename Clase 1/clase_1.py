@@ -434,4 +434,4 @@
 # 3. Desarrolla la función cuadrado usando lambda.
 #
 #RTA= 
-print((lambda num: num * 2 )(2))
+#print((lambda num: num * 2 )(2))
