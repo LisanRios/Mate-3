@@ -68,20 +68,49 @@
 # print(s1)
 # nota_max = notas.max()
 
+# import pandas as pd
+# import numpy as np
+
+# rng = np.random.RandomState(0)
+# df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+#  'data1': range(6), 'data2': rng.randint(0, 10, 6)},
+#  columns = ['key', 'data1', 'data2'])
+
+# print(df)
+
+# df.groupby('key').aggregate(['min', np.median, max])
+# print(df)
+
+# TAREA 
+
+# 1. Dados los archivos .txt, users, ratings y movies. Ejecutar el siguiente código y escribir como comentario,
+# detallando qué realiza cada bloque. Tener en cuenta que las rutas de acceso pueden ser otras. Por último,
+# genera el código de agrupamiento y agregación necesario para calcular: suma, cuenta, media, desviación estándar,
+# utilizando las funciones de numpy (ej: np.sum)
+
 import pandas as pd
-import numpy as np
-
-rng = np.random.RandomState(0)
-df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
- 'data1': range(6), 'data2': rng.randint(0, 10, 6)},
- columns = ['key', 'data1', 'data2'])
-
-print(df)
-
-df.groupby('key').aggregate(['min', np.median, max])
-print(df)
-
-
-
-
-
+userHeader = ['user_id', 'gender', 'age', 'ocupation', 'zip']
+users = pd.read_table('archs/dataset/users.txt', engine='python', sep='::',
+header=None, names=userHeader)
+ratingHeader = ['user_id', 'movie_id', 'rating', 'timestamp']
+ratings = pd.read_table('archs/dataset/ratings.txt', engine='python', sep='::',
+header=None, names=ratingHeader)
+mergeRatings = pd.merge(users, ratings, on='user_id')
+mergeRatings = mergeRatings.drop(['user_id','zip','timestamp','ocupation'], axis=1)
+movieHeader = ['movie_id', 'title', 'genders']
+movies = pd.read_table('archs/dataset/movies.txt', engine='python', sep='::', header=None,
+names=movieHeader, encoding='latin-1')
+movies[movies.title.str.contains("Exorcist")]
+merge = pd.merge(mergeRatings, movies)
+merge.groupby('gender').size().plot(kind='bar', fontsize=10, rot=45, color='turquoise')
+merge["Género"] = merge["genders"].str.split('|', n=1, expand= True)[0]
+colors = ['magenta','tan','mediumseagreen','orange','blueviolet', 'gold', 'salmon', 'limegreen']
+merge.groupby('Género').size().plot(kind='bar', color=colors)
+info1000 = merge.loc[1000]
+info7_12 = merge[7:12]
+numberRatings = merge.groupby('title').size().sort_values(ascending=False)
+numberRatings[:5]
+avgRatings = merge.groupby(['movie_id', 'title']).mean()
+avgRatings['rating'][:10]
+dataRatings = merge.groupby(['movie_id', 'title'])['rating'].agg(['mean', 'sum', 'count', 'std'])
+dataRatings[:10]
